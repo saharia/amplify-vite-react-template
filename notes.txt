@@ -1,0 +1,4 @@
+get control of data from backend app sync works
+
+dateTime 
+vali

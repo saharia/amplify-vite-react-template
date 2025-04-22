@@ -1,4 +1,5 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
+import { LearningType, LearningStage } from "../../shared/enums/Assignment"; // Adjust the path if necessary
 
 /*== STEP 1 ===============================================================
 The section below creates a Todo database table with a "content" field. Try
@@ -6,12 +7,28 @@ adding a new "isDone" field as a boolean. The authorization rule below
 specifies that any user authenticated via an API key can "create", "read",
 "update", and "delete" any "Todo" records.
 =========================================================================*/
+
+
 const schema = a.schema({
-  Todo: a
+    Assignment: a
     .model({
-      content: a.string(),
+      title: a.string().required(), // Title of the assignment
+      content: a.string().required(), // Content or description of the assignment
+      ageRange: a.customType({
+          lower: a.integer().required(), // Lower age limit
+          upper: a.integer().required(), // Upper age limit
+        }),
+      workSet: a.string(), // Optional work set name
+      learningType: a.enum(Object.values(LearningType)), // Type of learning
+      learningStage: a.enum(Object.values(LearningStage)), // Stage of learning
+      scaffolding: a
+        .customType({
+          chunks: a.boolean(), // Break assignment into smaller chunks
+          guidance: a.boolean(), // Guidance or supervision
+          visualAids: a.boolean(), // Additional visual aids
+        }),
     })
-    .authorization((allow) => [allow.publicApiKey()]),
+    .authorization((allow) => [allow.publicApiKey()])
 });
 
 export type Schema = ClientSchema<typeof schema>;

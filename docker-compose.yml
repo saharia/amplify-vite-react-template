@@ -1,0 +1,18 @@
+
+services:
+  amplify-app:
+    build: .
+    container_name: amplify-app
+    ports:
+      - "5173:5173"
+      - "3000:3000"
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+      - ~/.aws:/root/.aws:ro
+    environment:
+      - AWS_PROFILE=default
+      - AWS_CONFIG_FILE=/root/.aws/config
+      - AWS_SSO_SESSION=amplify-admin
+    # command: npm run dev
+
