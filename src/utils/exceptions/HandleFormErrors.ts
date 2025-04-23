@@ -30,5 +30,14 @@ export const useHandleErrors = <T>() => {
     console.error("Mapped field errors:", fieldErrors);
   };
 
-  return { handleErrors };
+  const handleCatchError = (error: any) => {
+    if (error?.message) {
+      showAlert(error.message, "error");
+    } else {
+      showAlert("An unexpected error occurred", "error");
+      console.error("Unhandled error:", error);
+    }
+  };
+
+  return { handleErrors, handleCatchError };
 };

@@ -30,8 +30,12 @@ const assignmentSchema = z.object({
   content: z.string().min(5),
   ageRange: z
     .object({
-      lower: z.preprocess((val) => Number(val), z.number().min(1, "Lower age must be 1 or greater.")).describe("Lower age"),
-      upper: z.preprocess((val) => Number(val), z.number().min(1, "Upper age must be 1 or greater.")).describe("Upper age"),
+      // lower: z.preprocess((val) => Number(val) as number, z.number().min(1, "Lower age must be 1 or greater.")).describe("Lower age"),
+      // upper: z.preprocess((val) => Number(val) as number, z.number().min(1, "Upper age must be 1 or greater.")).describe("Upper age"),
+      lower: z
+        .number(),
+        upper: z
+        .number(),
     })
     .refine((data) => data.upper > data.lower, {
       message: "Upper age must be greater than lower age.",
@@ -54,7 +58,7 @@ type AssignmentFormValues = z.infer<typeof assignmentSchema>;
 function CreateAssignment() {
 
   const navigate = useNavigate();
-  const { handleErrors } = useHandleErrors<AssignmentFormValues>();
+  const { handleErrors, handleCatchError } = useHandleErrors<AssignmentFormValues>();
   const {
     control,
     handleSubmit,
@@ -68,23 +72,16 @@ function CreateAssignment() {
 
   const onSubmit = async (data: AssignmentFormValues) => {
     console.log("Form Submitted:", data);
-
     try {
       const response = await client.models.Assignment.create(data);
       if (response?.errors) {
-        console.error("Error creating assignment:", JSON.stringify(response.errors));
-
         handleErrors(response.errors, setError);
-
         return;
       }
-
-      console.log("Assignment:", response.data);
       navigate("/");
     } catch (error) {
-      console.error("Error creating assignment:", error);
+      handleCatchError(error);
     }
-    // console.log("Assignment:", assignment);
   };
 
   return (

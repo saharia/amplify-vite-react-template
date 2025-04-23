@@ -13,16 +13,21 @@ import {
   TableRow,
 } from '@mui/material';
 import { Buttons } from "../../utils/icons/ButtonWithIcon";
+import { useHandleErrors } from "../../utils/exceptions/HandleFormErrors";
 
 const client = generateClient<Schema>();
 
 const AssignmentList: React.FC = () => {
   const [assignments, setAssignment] = useState<Array<Schema["Assignment"]["type"]>>([]);
   const { CreateButton } = Buttons();
+  const { handleCatchError } = useHandleErrors<{}>();
 
   useEffect(() => {
     client.models.Assignment.observeQuery().subscribe({
       next: (data) => setAssignment([...data.items]),
+      error: (error) => {
+        handleCatchError(error);
+      },
     });
   }, []);
 
