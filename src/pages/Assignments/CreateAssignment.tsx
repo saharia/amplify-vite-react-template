@@ -3,7 +3,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
 import { generateClient } from "aws-amplify/data";
-import type { Schema } from "@/amplify/data/resource";
+import type { Schema } from "../../../amplify/data/resource";
 import {
   TextField,
   FormControl,
@@ -42,8 +42,8 @@ const assignmentSchema = z.object({
       path: ["upper"], // This will attach the error to the "upper" field
     }),
   workSet: z.string().optional(),
-  learningType: z.string().min(1),
-  learningStage: z.string().min(1),
+  learningType: z.nativeEnum(LearningType),
+  learningStage: z.nativeEnum(LearningStage),
   scaffolding: z.object({
     chunks: z.boolean(),
     guidance: z.boolean(),
