@@ -1,4 +1,4 @@
-import { UseFormSetError } from "react-hook-form";
+import { FieldValues, Path, UseFormSetError } from "react-hook-form";
 import { useAlert } from "../notifications/AlertContext";
 
 type ErrorResponse = {
@@ -6,7 +6,7 @@ type ErrorResponse = {
   message: string;
 };
 
-export const useHandleErrors = <T>() => {
+export const useHandleErrors = <T extends FieldValues>() => {
   const { showAlert } = useAlert();
 
   const handleErrors = (errors: ErrorResponse[], setError: UseFormSetError<T>) => {
@@ -17,7 +17,7 @@ export const useHandleErrors = <T>() => {
       const message = error.message;
       if (field) {
         fieldErrors[field] = message;
-        setError(field as keyof T, { type: "manual", message });
+        setError(field as unknown as Path<T>, { type: "manual", message });
       }
     });
 
