@@ -1,4 +1,6 @@
 get control of data from backend app sync works
 
 dateTime 
-vali
+validation
+
+        - npm ci --cache .npm --prefer-offline
