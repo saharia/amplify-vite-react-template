@@ -30,12 +30,8 @@ const assignmentSchema = z.object({
   content: z.string().min(5),
   ageRange: z
     .object({
-      // lower: z.preprocess((val) => Number(val) as number, z.number().min(1, "Lower age must be 1 or greater.")).describe("Lower age"),
-      // upper: z.preprocess((val) => Number(val) as number, z.number().min(1, "Upper age must be 1 or greater.")).describe("Upper age"),
-      lower: z
-        .number(),
-        upper: z
-        .number(),
+      lower: z.number().min(1),
+      upper: z.number().min(1),
     })
     .refine((data) => data.upper > data.lower, {
       message: "Upper age must be greater than lower age.",
@@ -57,6 +53,7 @@ type AssignmentFormValues = z.infer<typeof assignmentSchema>;
 
 function CreateAssignment() {
 
+  console.log(defaultValues);
   const navigate = useNavigate();
   const { handleErrors, handleCatchError } = useHandleErrors<AssignmentFormValues>();
   const {
@@ -147,6 +144,11 @@ function CreateAssignment() {
                 fullWidth
                 error={!!errors.ageRange?.lower}
                 helperText={errors.ageRange?.lower?.message}
+                onChange={(e) => {
+                  const value = e.target.value === "" ? "" : Number(e.target.value);
+                  field.onChange(value);
+                }}
+                value={field.value === undefined ? "" : field.value}
               />
             )}
           />
@@ -161,6 +163,11 @@ function CreateAssignment() {
                 fullWidth
                 error={!!errors.ageRange?.upper}
                 helperText={errors.ageRange?.upper?.message}
+                onChange={(e) => {
+                  const value = e.target.value === "" ? "" : Number(e.target.value);
+                  field.onChange(value);
+                }}
+                value={field.value === undefined ? "" : field.value}
               />
             )}
           />

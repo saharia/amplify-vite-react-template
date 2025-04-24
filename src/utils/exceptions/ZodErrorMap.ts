@@ -21,7 +21,21 @@ export const customErrorMap: ZodErrorMap = (issue, ctx) => {
       : formatLabel(field ?? "Field");
 
   // const label = field ? capitalize(field) : "This field";
-
+  if (!ctx.data || ctx.data === null || ctx.data === undefined) {
+    return {
+      message: `${label} is required`,
+    };
+  }
+  if (issue.code === z.ZodIssueCode.invalid_type && issue.received === "undefined") {
+    return {
+      message: `${label} is required`,
+    };
+  }
+  if (issue.code === z.ZodIssueCode.invalid_type && issue.message === "Required") {
+    return {
+      message: `${label} is required`,
+    };
+  }
   if (issue.code === z.ZodIssueCode.too_small && issue.type === "string") {
     return {
       message: `${label} must be at least ${issue.minimum} characters`,
@@ -33,6 +47,18 @@ export const customErrorMap: ZodErrorMap = (issue, ctx) => {
       message: `${label} must be at most ${issue.maximum} characters`,
     };
   }
+  if (issue.code === z.ZodIssueCode.invalid_enum_value) {
+    return {
+      message: `${label} has an invalid value`,
+    };
+  }
+
+  if (issue.code === z.ZodIssueCode.invalid_type && issue.expected === "number" && issue.received === "string") {
+    return {
+      message: `${label} must be a number`,
+    };
+  }
+
   if (issue.code === z.ZodIssueCode.too_small && issue.type === "number") {
     return {
       message: `${label} must be greater than or equal to ${issue.minimum}`,
@@ -45,11 +71,7 @@ export const customErrorMap: ZodErrorMap = (issue, ctx) => {
     };
   }
 
-  if (issue.code === z.ZodIssueCode.invalid_type && issue.received === "undefined") {
-    return {
-      message: `${label} is required`,
-    };
-  }
+
 
   return { message: ctx.defaultError };
 };
@@ -91,6 +113,8 @@ export const getDefaultValues = (schema: z.ZodTypeAny): any => {
       return '';
     case "ZodBoolean":
       return false;
+    case "ZodNativeEnum":
+      return "";
     case "ZodArray":
       return [];
     case "ZodRecord":
