@@ -10,15 +10,15 @@ const formatLabel = (field?: string): string => {
     .replace(/^./, s => s.toUpperCase());
 };
 
-export const customErrorMap: ZodErrorMap = (issue, ctx) => {
+export const createCustomErrorMap = (labels: Record<string, string>): ZodErrorMap => {
+  return (issue, ctx) => {
   // console.log("Custom error map called", issue, ctx);
+  console.log("Field", issue, ctx, labels);
 
   const field = (issue as any).path?.[0] as string;
 
-  const label =
-    (issue as any)?.path && (issue as any)?.schema?.description
-      ? (issue as any)?.schema.description
-      : formatLabel(field ?? "Field");
+  const label = labels[issue.path?.join(".")] ?? formatLabel(field);
+
 
   // const label = field ? capitalize(field) : "This field";
   if (!ctx.data || ctx.data === null || ctx.data === undefined) {
@@ -75,6 +75,7 @@ export const customErrorMap: ZodErrorMap = (issue, ctx) => {
 
   return { message: ctx.defaultError };
 };
+};
 
 
 const unwrapSchema = (schema: z.ZodTypeAny): z.ZodTypeAny => {
@@ -126,6 +127,27 @@ export const getDefaultValues = (schema: z.ZodTypeAny): any => {
   }
 };
 
+export function extractLabelsFromSchema(schema: z.ZodTypeAny): Record<string, string> {
+  const labels: Record<string, string> = {};
+
+  const traverseSchema = (currentSchema: z.ZodTypeAny, path: string[] = []) => {
+    const baseSchema = unwrapSchema(currentSchema);
+
+    if (baseSchema._def.typeName === "ZodObject") {
+      const shape = baseSchema._def.shape();
+      for (const key in shape) {
+        traverseSchema(shape[key], [...path, key]);
+      }
+    } else if (baseSchema._def.description) {
+      const fieldPath = path.join(".");
+      labels[fieldPath] = baseSchema._def.description;
+    }
+  };
+
+  traverseSchema(schema);
+  return labels;
+}
+
 
 // Set the custom error map globally
-z.setErrorMap(customErrorMap);
+// z.setErrorMap(customErrorMap);

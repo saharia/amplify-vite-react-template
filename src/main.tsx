@@ -7,7 +7,6 @@ import { RouterProvider } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
 import { AlertProvider } from "./utils/notifications/AlertContext.tsx";
-import "./utils/exceptions/ZodErrorMap.ts"; // Import to apply the global error map
 import router from "./routes/index";
 
 Amplify.configure(outputs);

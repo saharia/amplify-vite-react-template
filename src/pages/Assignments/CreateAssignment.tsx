@@ -21,7 +21,7 @@ import {
 } from "@mui/material";
 import { useHandleErrors } from "../../utils/exceptions/HandleFormErrors";
 import { LearningType, LearningStage } from "../../../shared/enums/Assignment";
-import { getDefaultValues } from "../../utils/exceptions/ZodErrorMap";
+import { createCustomErrorMap, extractLabelsFromSchema, getDefaultValues } from "../../utils/exceptions/ZodErrorMap";
 
 const client = generateClient<Schema>();
 
@@ -30,8 +30,8 @@ const assignmentSchema = z.object({
   content: z.string().min(5),
   ageRange: z
     .object({
-      lower: z.number().min(1),
-      upper: z.number().min(1),
+      lower: z.number().min(1).describe("Lower age"),
+      upper: z.number().min(1).describe("Upper age"),
     })
     .refine((data) => data.upper > data.lower, {
       message: "Upper age must be greater than lower age.",
@@ -50,6 +50,9 @@ const assignmentSchema = z.object({
 const defaultValues: z.infer<typeof assignmentSchema> = getDefaultValues(assignmentSchema);
 
 type AssignmentFormValues = z.infer<typeof assignmentSchema>;
+
+const fieldLabels = extractLabelsFromSchema(assignmentSchema);
+z.setErrorMap(createCustomErrorMap(fieldLabels));
 
 function CreateAssignment() {
 
