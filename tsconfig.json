@@ -56,6 +56,11 @@
     "src",
     "vite-env.d.ts"
   ],
+  "exclude": [
+    "src/app/(public)/documentation/material-ui-components/components/**/*",
+    "src/app/(public)/documentation/material-ui-components/doc/**/*",
+    "node_modules"
+  ],
   "references": [
     {
       "path": "./tsconfig.node.json"

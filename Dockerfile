@@ -16,7 +16,7 @@ RUN npm install
 COPY . .
 
 # Expose port
-EXPOSE 3000
+# EXPOSE 3000
 
 # Use nodemon to start app
-CMD ["sh", "-c", "npx ampx sandbox & npm run dev"]
+# CMD ["sh", "-c", "npx ampx sandbox & npm run dev"]

@@ -6,6 +6,7 @@ services:
     ports:
       - "5173:5173"
       - "3000:3000"
+      - "4173:4173"
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
@@ -13,6 +14,8 @@ services:
     environment:
       - AWS_PROFILE=default
       - AWS_CONFIG_FILE=/root/.aws/config
-      - AWS_SSO_SESSION=amplify-admin
-    # command: npm run dev
+    command: >
+      sh -c "if [ \"$MODE\" = \"preview\" ]; then npm run preview; elif [ \"$MODE\" = \"build\" ]; then npm run build; else npm run dev; fi"
+    # environment:
+    #   - MODE=dev
 

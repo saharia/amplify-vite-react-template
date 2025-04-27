@@ -11,12 +11,15 @@ import { Amplify } from 'aws-amplify';
 Amplify.configure(outputs);
 
 async function mockSetup() {
-	return worker.start({
-		onUnhandledRequest: 'bypass',
-		serviceWorker: {
-			url: `${API_BASE_URL}/mockServiceWorker.js`
-		}
-	});
+  console.log(import.meta.env.MODE);
+  if (import.meta.env.MODE !== 'production') {
+    return worker.start({
+      onUnhandledRequest: 'bypass',
+      serviceWorker: {
+        url: `${API_BASE_URL}/mockServiceWorker.js`
+      }
+    });
+  }
 }
 
 /**
