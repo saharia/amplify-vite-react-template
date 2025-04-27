@@ -32,10 +32,6 @@ const routes: FuseRoutesType = [
 		auth: settingsConfig.defaultAuth,
 		errorElement: <ErrorBoundary />,
 		children: [
-			{
-				path: '/',
-				element: <Navigate to="/dashboard" />
-			},
 			...mainRoutes,
 			{
 				path: 'loading',

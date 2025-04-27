@@ -1,7 +1,7 @@
 import { LearningStage, LearningType } from '@shared/enums/Assignment';
 import { amplifyApiService as api } from 'src/store/amplifyApiService';
 
-export const addTagTypes = ['assessment_assignment_list'] as const;
+export const addTagTypes = ['assignment_list'] as const;
 
 const AssessmentApi = api
 	.enhanceEndpoints({
@@ -11,7 +11,7 @@ const AssessmentApi = api
 		endpoints: (build) => ({
 			getAssignments: build.query({
 				query: () => ({ modelName: 'Assignment', operation: 'list' }),
-				providesTags: ['assessment_assignment_list']
+				providesTags: ['assignment_list'],
 			})
 		}),
 		overrideExisting: false
@@ -38,6 +38,7 @@ export type Assignment = {
 		visualAids: boolean;
 	};
 };
+
 
 export type AssessmentApiType = {
 	[AssessmentApi.reducerPath]: ReturnType<typeof AssessmentApi.reducer>;

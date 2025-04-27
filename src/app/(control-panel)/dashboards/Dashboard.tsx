@@ -20,9 +20,9 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
 function Dashboard() {
 	const isMobile = useThemeMediaQuery((theme) => theme.breakpoints.down('lg'));
 
-	const { data, isLoading } = useGetAssignmentsQuery({});
-
-	if (isLoading) {
+	const { data, isFetching } = useGetAssignmentsQuery({}, { refetchOnMountOrArgChange: true });
+  console.log('⚡ Dashboard initialized', { data, isFetching });
+	if (isFetching) {
 		return <FuseLoading />;
 	}
 

@@ -22,6 +22,8 @@ function App() {
 		routes
 	};
 
+  console.log('⚡ App initialized', AppContextValue);
+
 	return (
 		<ErrorBoundary>
 			<AppContext.Provider value={AppContextValue}>

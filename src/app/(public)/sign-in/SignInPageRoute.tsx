@@ -3,7 +3,7 @@ import authRoles from '@auth/authRoles';
 import SignInPage from './SignInPage';
 
 const SignInPageRoute: FuseRouteItemType = {
-	path: 'sign-in',
+	path: '/',
 	element: <SignInPage />,
 	settings: {
 		layout: {

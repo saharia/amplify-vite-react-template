@@ -95,17 +95,18 @@ class FuseAuthorization extends Component<FuseAuthorizationProps, State> {
 	}
 
 	redirectRoute() {
-		const { userRole, navigate, loginRedirectUrl = '/' } = this.props;
+		const { userRole, navigate, loginRedirectUrl = '/dashboard' } = this.props;
 		const redirectUrl = getSessionRedirectUrl() || loginRedirectUrl;
 
-    console.log('⚡ redirectRoute', redirectUrl, userRole);
+    console.log('⚡ redirectRoute', redirectUrl, '---', userRole);
 		/*
 		User is guest
 		Redirect to Login Page
 		*/
 		if (isUserGuest(userRole)) {
 			if (navigate) {
-				setTimeout(() => navigate('/sign-in'), 0);
+        console.log('⚡ redirectRoute navigate main');
+				setTimeout(() => navigate('/'), 0);
 			}
 		} else {
 			/*
@@ -116,6 +117,7 @@ class FuseAuthorization extends Component<FuseAuthorizationProps, State> {
 			}
 			*/
       if (navigate) {
+        console.log('⚡ redirectRoute navigate', redirectUrl);
 				setTimeout(() => navigate(redirectUrl), 0);
 			}
 			// setTimeout(() => navigate(redirectUrl), 0);
