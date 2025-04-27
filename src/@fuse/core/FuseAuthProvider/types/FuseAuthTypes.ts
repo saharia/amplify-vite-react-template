@@ -1,10 +1,10 @@
 import React from 'react';
-import { PartialDeep } from 'type-fest/source/partial-deep';
+// import { PartialDeep } from 'type-fest/source/partial-deep';
 import { FuseAuthUser } from './FuseAuthUser';
 
 export type FuseAuthProviderMethods = {
 	signOut: () => void;
-	updateUser: (U: PartialDeep<FuseAuthUser>) => Promise<Response>;
+	// updateUser: (U: PartialDeep<FuseAuthUser>) => Promise<Response>;
 };
 
 export type FuseAuthProviderComponentProps = React.PropsWithChildren<{

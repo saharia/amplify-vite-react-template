@@ -12,7 +12,7 @@ export const initialAuthState: AuthState = {
 	authStatus: 'configuring',
 	isAuthenticated: false,
 	user: null,
-	provider: null
+	provider: 'jwt'
 };
 
 export type FuseAuthContextType = {

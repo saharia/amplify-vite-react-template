@@ -19,6 +19,12 @@ export async function authSignInWithToken(accessToken: string): Promise<Response
 	});
 }
 
+export async function authSignInWithTokenNew(accessToken: string): Promise<Response> {
+	return fetch('/api/mock/auth/sign-in-with-token', {
+		headers: { Authorization: `Bearer ${accessToken}` }
+	});
+}
+
 /**
  * Sign in
  */

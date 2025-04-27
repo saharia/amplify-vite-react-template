@@ -1,7 +1,5 @@
 import React, { useCallback, useMemo, useState, useRef, useEffect } from 'react';
-import { PartialDeep } from 'type-fest';
 import FuseLoading from '@fuse/core/FuseLoading';
-import { User } from '@auth/user';
 import { FuseAuthProviderType, FuseAuthProviderMethods, FuseAuthProviderState } from './types/FuseAuthTypes';
 import FuseAuthContext from './FuseAuthContext';
 import { AuthState, initialAuthState } from './FuseAuthContext';
@@ -14,16 +12,17 @@ type FuseAuthenticationProviderProps = {
 };
 
 function FuseAuthProvider(props: FuseAuthenticationProviderProps) {
-	const { children, providers, onAuthStateChanged } = props;
+	const { children, providers } = props;
 
 	const [authState, setAuthState] = useState<AuthState | null>(initialAuthState);
 
 	const currentAuthStatus = useMemo(() => authState?.authStatus, [authState]);
 	const [isLoading, setIsLoading] = useState(true);
-
+  
 	const [providerStatuses, setProviderStatuses] = useState<Record<string, string>>({});
 	const providerRefs = useRef<Record<string, FuseAuthProviderMethods | null>>({});
 	const currentProvider = useMemo(() => providerRefs.current[authState?.provider ?? ''], [authState, providerRefs]);
+  console.log('⚡ FuseAuthProvider initialized', authState, currentProvider);
 
 	const allProvidersReady = useMemo(() => {
 		return providers.every(
@@ -47,14 +46,17 @@ function FuseAuthProvider(props: FuseAuthenticationProviderProps) {
 
 	const handleAuthStateChange = useCallback(
 		(providerAuthState: FuseAuthProviderState, name: string) => {
+      console.log('⚡ handleAuthStateChange called', providerAuthState);
 			setProviderStatuses((prevStatuses) => ({
 				...prevStatuses,
 				[name]: providerAuthState.authStatus
 			}));
 			setAuthState((prev) => {
+        console.log('⚡ setAuthState called', prev, providerAuthState, name);
 				// Scenario 1: Same provider, user logged out
 				if (prev && prev.provider === name && !providerAuthState.isAuthenticated) {
-					return initialAuthState;
+					// return initialAuthState;
+          return { ...providerAuthState, provider: name };
 				}
 
 				// Scenario 2: Ignore unauthenticated state if previously authenticated
@@ -74,15 +76,16 @@ function FuseAuthProvider(props: FuseAuthenticationProviderProps) {
 		[setAuthProvider]
 	);
 
-	useEffect(() => {
+	/* useEffect(() => {
 		if (onAuthStateChanged) {
 			if (authState) {
 				onAuthStateChanged(authState);
 			}
 		}
-	}, [onAuthStateChanged, authState]);
+	}, [onAuthStateChanged, authState]); */
 
 	useEffect(() => {
+    console.log('⚡ useEffect for allProvidersReady', allProvidersReady, currentAuthStatus);
 		if (allProvidersReady && currentAuthStatus !== 'configuring') {
 			setIsLoading(false);
 		}
@@ -98,7 +101,7 @@ function FuseAuthProvider(props: FuseAuthenticationProviderProps) {
 		}
 	}, [currentProvider, resetAuthProvider]);
 
-	const updateUser = useCallback(
+	/* const updateUser = useCallback(
 		async (_userData: PartialDeep<User>) => {
 			if (currentProvider?.updateUser) {
 				return currentProvider?.updateUser(_userData);
@@ -107,7 +110,7 @@ function FuseAuthProvider(props: FuseAuthenticationProviderProps) {
 			throw new Error('No current auth provider to updateUser from');
 		},
 		[currentProvider]
-	);
+	); */
 
 	const contextValue = useMemo(
 		() => ({
@@ -117,14 +120,14 @@ function FuseAuthProvider(props: FuseAuthenticationProviderProps) {
 			resetAuthProvider,
 			providers,
 			signOut,
-			updateUser,
+			// updateUser,
 			authState
 		}),
-		[authState, getAuthProvider, setAuthProvider, resetAuthProvider, providers, signOut, updateUser]
+		[authState, getAuthProvider, setAuthProvider, resetAuthProvider, providers, signOut]
 	);
 
 	// Nest providers with handleAuthStateChange and ref
-	const nestedProviders = useMemo(
+	/* const nestedProviders = useMemo(
 		() =>
 			providers.reduceRight(
 				(acc, { Provider, name }) => {
@@ -145,7 +148,50 @@ function FuseAuthProvider(props: FuseAuthenticationProviderProps) {
 				!isLoading ? children(authState) : <FuseLoading />
 			),
 		[providers, isLoading, handleAuthStateChange, children, authState]
-	);
+	); */
+
+  const nestedProviders = useMemo(() => {
+    console.log('⚡ nestedProviders recomputed');
+    console.log('   isLoading:', isLoading);
+    console.log('   authState:', authState);
+  
+    const initialChildren = !isLoading ? (
+      (() => {
+        console.log('✅ isLoading is false, calling children(authState)');
+        return children(authState);
+      })()
+    ) : (
+      (() => {
+        console.log('⏳ isLoading is true, showing <FuseLoading />');
+        return <FuseLoading />;
+      })()
+    );
+  
+    const wrappedProviders = providers.reduceRight(
+      (acc, { Provider, name }) => {
+        console.log(`🔁 Wrapping provider: ${name}`);
+        return (
+          <Provider
+            key={name}
+            ref={(ref: FuseAuthProviderMethods | null) => {
+              console.log(`📌 Setting ref for provider: ${name}`, ref);
+              providerRefs.current[name] = ref;
+            }}
+            onAuthStateChanged={(authState) => {
+              console.log(`🔄 onAuthStateChanged called for ${name}`, authState);
+              handleAuthStateChange(authState, name);
+            }}
+          >
+            {acc}
+          </Provider>
+        );
+      },
+      initialChildren
+    );
+  
+    return wrappedProviders;
+  }, [providers, isLoading, handleAuthStateChange, children, authState]);
+  
 
 	return <FuseAuthContext.Provider value={contextValue}>{nestedProviders}</FuseAuthContext.Provider>;
 }
